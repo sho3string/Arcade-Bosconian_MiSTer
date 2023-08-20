@@ -28,7 +28,7 @@
 
 module arcade_video #(parameter WIDTH=320, DW=8, GAMMA=1)
 (
-	input         clk_video,
+	input         clk_video_i,     // was clk_video
 	input         ce_pix,
 
 	input[DW-1:0] RGB_in,
@@ -37,7 +37,7 @@ module arcade_video #(parameter WIDTH=320, DW=8, GAMMA=1)
 	input         HSync,
 	input         VSync,
 
-	output        CLK_VIDEO,
+	output        CLK_VIDEO_o,     // was CLK_VIDEO
 	output        CE_PIXEL,
 	output  [7:0] VGA_R,
 	output  [7:0] VGA_G,
@@ -52,7 +52,8 @@ module arcade_video #(parameter WIDTH=320, DW=8, GAMMA=1)
 	inout  [21:0] gamma_bus
 );
 
-assign CLK_VIDEO = clk_video;
+assign CLK_VIDEO   = clk_video_i;
+assign CLK_VIDEO_o = clk_video_i;
 
 wire hs_fix,vs_fix;
 sync_fix sync_v(CLK_VIDEO, HSync, hs_fix);
@@ -63,6 +64,7 @@ reg [DW-1:0] RGB_fix;
 reg CE,HS,VS,HBL,VBL;
 reg old_ce;
 always @(posedge CLK_VIDEO) begin
+	
 	old_ce <= ce_pix;
 	CE <= 0;
 	if(~old_ce & ce_pix) begin

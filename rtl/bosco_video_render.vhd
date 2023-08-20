@@ -868,14 +868,14 @@ generic map
   -- selected. This means that, while scanning across the screen and reading
   -- this RAM, each nibble in the RAM will be cleared IMMEDIATELY after it is
   -- read!
-  i_4J : entity work.gen_ram
-  generic map(aWidth => 8, dWidth => 4)
+  i_4J : entity work.dualport_2clk_ram
+  generic map(8,4)
   port map (
-    clk  => clk_i,
-    we   => ram_4J_we,
-    addr => ram_4J_addr,
-    d    => ram_4J_di,
-    q    => ram_4J_do_pre_cs
+    clock_a    => clk_i,
+    wren_a     => ram_4J_we,
+    address_a  => ram_4J_addr,
+    data_a     => ram_4J_di,
+    q_a        => ram_4J_do_pre_cs
   );
 
   -- The original hardware uses a bus for the RAM data I/O, with 1K pullups.
@@ -986,14 +986,14 @@ generic map
   --
   -- This RAM's write enable (active low) is the 6MHZ clock signal,
   -- meaning that it writes when 6MHZ is low.
-  i_2B : entity work.gen_ram
-  generic map(aWidth => 9, dWidth => 2)
+  i_2B : entity work.dualport_2clk_ram
+  generic map(9,2)
   port map (
-    clk  => clk_i,
-    we   => ram_2B_we,
-    addr => ram_2B_addr,
-    d    => ram_2B_di,
-    q    => ram_2B_do_pre_cs
+    clock_a   => clk_i,
+    wren_a    => ram_2B_we,
+    address_a => ram_2B_addr,
+    data_a    => ram_2B_di,
+    q_a       => ram_2B_do_pre_cs
   );
 
   -- The original hardware uses a bus for the RAM data I/O, with 1K pullups.
