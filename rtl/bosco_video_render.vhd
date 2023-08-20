@@ -604,7 +604,13 @@ begin
 
   -- 5D: 2732 EPROM (ROM section BS-P) - 12-bit addr, 8-bit data
   -- Contains tile layout data, 2bpp.
-  i_5D : entity work.dpram generic map (12,8)
+  i_5D : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
   port map
   (
     -- port A: initial load
@@ -621,7 +627,13 @@ begin
 
   -- 5D: 2732 EPROM (ROM section BS-N) - 12-bit addr, 8-bit data
   -- Contains sprite layout data, 2bpp.
-  i_5E : entity work.dpram generic map (12,8)
+i_5E : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
   port map
   (
     -- port A: initial load
@@ -918,7 +930,13 @@ begin
   -- Only uses the first half of the address space; hence, the top bit of the
   -- address is grounded. Also only uses the lower 3 bits of the data.
   rom_2D_addr <= std_logic_vector('0' & reg_1D_Q43218 & hcount_s(1 downto 0));
-  i_2D : entity work.dpram generic map (8,3)
+  i_2D : entity work.dualport_2clk_ram 
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 8,
+    DATA_WIDTH   => 3
+)
   port map
   (
     -- port A: initial load

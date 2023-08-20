@@ -122,6 +122,7 @@ port(
 	dip_switch_a   : in std_logic_vector (7 downto 0);
 	dip_switch_b   : in std_logic_vector (7 downto 0);
 
+    dn_clk         : in  std_logic;
 	dn_addr        : in  std_logic_vector(15 downto 0);
 	dn_data        : in  std_logic_vector(7 downto 0);
 	dn_wr          : in  std_logic;
@@ -143,8 +144,8 @@ architecture struct of bosconian is
 
  -- c07 clock enables
  signal c07_clken_s : r_c07_syncgen_clken;
- signal c07_clken_posedge_s : r_c07_syncgen_clken_out;
- signal c07_clken_negedge_s : r_c07_syncgen_clken_out;
+ signal c07_clken_posedge_s  : r_c07_syncgen_clken_out;
+ signal c07_clken_negedge_s  : r_c07_syncgen_clken_out;
 
  -- clocking/timing
  signal hcnt     : std_logic_vector(8 downto 0);
@@ -355,12 +356,12 @@ architecture struct of bosconian is
  signal rom51_wren     : std_logic;
  signal rom52_wren     : std_logic;
  signal rom54_wren     : std_logic;
+ 
 begin
 
 clock_18n <= not clock_18;
 reset_n   <= not reset;
 pause_n   <= not pause;
-
 
 dip_switch_do <= "000000" &
                  dip_switch_a(to_integer(unsigned(mux_addr(2 downto 0)))) &
@@ -724,7 +725,7 @@ i_4D : entity work.C07_SYNCGEN
     vsync_l => open,
     vblank_l => vblank_n,
     vcount_o => vcnt,
-    clken_posegde_o => open,
+    --clken_posegde_o => open,
     --clken_negegde_o => open
     clken_posegde_o => c07_clken_posedge_s,
     clken_negegde_o => c07_clken_negedge_s
@@ -936,10 +937,16 @@ port map(
 );
 
 -- cs51xx program ROM
-cs51xx_prog : entity work.dpram generic map (10,8)
+cs51xx_prog : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 10,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom51_wren,
 	address_a => dn_addr(9 downto 0),
 	data_a    => dn_data,
@@ -999,10 +1006,16 @@ port map(
 );
 
 -- cs50xx #0 program ROM
-cs50xx_0_prog : entity work.dpram generic map (11,8)
+cs50xx_0_prog : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 11,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom50_wren,
 	address_a => dn_addr(10 downto 0),
 	data_a    => dn_data,
@@ -1054,10 +1067,16 @@ port map(
 );
 
 -- cs50xx #1 program ROM
-cs50xx_1_prog : entity work.dpram generic map (11,8)
+cs50xx_1_prog : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 11,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom50_wren,
 	address_a => dn_addr(10 downto 0),
 	data_a    => dn_data,
@@ -1110,10 +1129,16 @@ port map(
 );
 
 -- cs54xx program ROM
-cs54xx_prog : entity work.dpram generic map (10,8)
+cs54xx_prog : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 10,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom54_wren,
 	address_a => dn_addr(9 downto 0),
 	data_a    => dn_data,
@@ -1190,10 +1215,16 @@ begin
 end process;
 
 -- cs52xx program ROM
-cs52xx_prog : entity work.dpram generic map (10,8)
+cs52xx_prog : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 10,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom52_wren,
 	address_a => dn_addr(9 downto 0),
 	data_a    => dn_data,
@@ -1204,10 +1235,16 @@ port map
 );
 
 -- cs52xx data (digitized speech) ROMs
-romvoice0 : entity work.dpram generic map (12,8)
+romvoice0 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => romvoice0_wren,
 	address_a => dn_addr(11 downto 0),
 	data_a    => dn_data,
@@ -1216,10 +1253,16 @@ port map
 	address_b => romvoice_addr(11 downto 0),
 	q_b       => romvoice0_do
 );
-romvoice1 : entity work.dpram generic map (12,8)
+romvoice1 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => romvoice1_wren,
 	address_a => dn_addr(11 downto 0),
 	data_a    => dn_data,
@@ -1228,10 +1271,16 @@ port map
 	address_b => romvoice_addr(11 downto 0),
 	q_b       => romvoice1_do
 );
-romvoice2 : entity work.dpram generic map (12,8)
+romvoice2 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => romvoice2_wren,
 	address_a => dn_addr(11 downto 0),
 	data_a    => dn_data,
@@ -1330,10 +1379,16 @@ romcolor_wren  <= '1' when dn_wr = '1' and dn_addr(15 downto  8) = "11100100" el
 romradar_wren  <= '1' when dn_wr = '1' and dn_addr(15 downto  8) = "11100101" else '0';
 
 -- cpu1 program ROM
-rom_cpu1 : entity work.dpram generic map (14,8)
+rom_cpu1 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 14,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom1_wren,
 	address_a => dn_addr(13 downto 0),
 	data_a    => dn_data,
@@ -1344,10 +1399,16 @@ port map
 );
 
 -- cpu2 program ROM
-rom_cpu2 : entity work.dpram generic map (13,8)
+rom_cpu2 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 13,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom2_wren,
 	address_a => dn_addr(12 downto 0),
 	data_a    => dn_data,
@@ -1358,10 +1419,16 @@ port map
 );
 
 -- cpu3 program ROM
-rom_cpu3 : entity work.dpram generic map (12,8)
+rom_cpu3 : entity work.dualport_2clk_ram
+generic map 
+(
+    FALLING_A    => true,
+    ADDR_WIDTH   => 12,
+    DATA_WIDTH   => 8
+)
 port map
 (
-	clock_a   => clock_18,
+	clock_a   => dn_clk,
 	wren_a    => rom3_wren,
 	address_a => dn_addr(11 downto 0),
 	data_a    => dn_data,
