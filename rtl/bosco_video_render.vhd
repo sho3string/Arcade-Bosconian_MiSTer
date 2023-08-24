@@ -23,6 +23,9 @@ entity bosconian_video is port (
   clk_en_i   : in    std_ulogic;
   clkn_en_i  : in    std_ulogic;
   resn_i     : in    std_ulogic;
+  
+  -- added for M2M rom loading
+  dn_clk_i     : in    std_logic;
 
   -- inputs: user controls (not on original hardware)
   pause      : in  std_logic;
@@ -614,7 +617,7 @@ generic map
   port map
   (
     -- port A: initial load
-    clock_a   => clk_i,
+    clock_a   => dn_clk_i,
     wren_a    => romchar_wren,
     address_a => a_i(11 downto 0),
     data_a    => d_i,
@@ -637,7 +640,7 @@ generic map
   port map
   (
     -- port A: initial load
-    clock_a   => clk_i,
+    clock_a   => dn_clk_i,
     wren_a    => romsprite_wren,
     address_a => a_i(11 downto 0),
     data_a    => d_i,
@@ -868,14 +871,14 @@ generic map
   -- selected. This means that, while scanning across the screen and reading
   -- this RAM, each nibble in the RAM will be cleared IMMEDIATELY after it is
   -- read!
-  i_4J : entity work.dualport_2clk_ram
-  generic map(8,4)
+  i_4J : entity work.gen_ram
+  generic map(aWidth => 8, dWidth => 4)
   port map (
-    clock_a    => clk_i,
-    wren_a     => ram_4J_we,
-    address_a  => ram_4J_addr,
-    data_a     => ram_4J_di,
-    q_a        => ram_4J_do_pre_cs
+    clk  => clk_i,
+    we   => ram_4J_we,
+    addr => ram_4J_addr,
+    d    => ram_4J_di,
+    q    => ram_4J_do_pre_cs
   );
 
   -- The original hardware uses a bus for the RAM data I/O, with 1K pullups.
@@ -940,7 +943,7 @@ generic map
   port map
   (
     -- port A: initial load
-    clock_a   => clk_i,
+    clock_a   => dn_clk_i,
     wren_a    => romradar_wren,
     address_a => a_i(7 downto 0),
     data_a    => d_i(2 downto 0),
@@ -986,14 +989,14 @@ generic map
   --
   -- This RAM's write enable (active low) is the 6MHZ clock signal,
   -- meaning that it writes when 6MHZ is low.
-  i_2B : entity work.dualport_2clk_ram
-  generic map(9,2)
+  i_2B : entity work.gen_ram
+  generic map(aWidth => 9,dWidth => 2)
   port map (
-    clock_a   => clk_i,
-    wren_a    => ram_2B_we,
-    address_a => ram_2B_addr,
-    data_a    => ram_2B_di,
-    q_a       => ram_2B_do_pre_cs
+    clk  => clk_i,
+    we   => ram_2B_we,
+    addr => ram_2B_addr,
+    d    => ram_2B_di,
+    q    => ram_2B_do_pre_cs
   );
 
   -- The original hardware uses a bus for the RAM data I/O, with 1K pullups.

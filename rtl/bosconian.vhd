@@ -465,6 +465,9 @@ port map (
   clk_en_i => video_6M_ena,
   clkn_en_i => video_6Mn_ena,
   resn_i => reset_n,
+  
+  -- M2M rom loading
+  dn_clk_i => dn_clk,
 
   -- inputs: user controls (not on original hardware)
   pause => pause,
@@ -1439,25 +1442,25 @@ port map
 );
 
 -- Tilemap RAM 1: tile code (1st half is radar + sprite registers; 2nd half is scrolling playfield)
-bgram1 : entity work.dualport_2clk_ram
-generic map(11,8)
+bgram1 : entity work.gen_ram
+generic map(aWidth => 11, dWidth => 8)
 port map(
-	clock_a   => clock_18n,
-	wren_a    => bgram1_we,
-	address_a => mux_addr(10 downto 0),
-	data_a    => mux_cpu_do,
-	q_a       => bgram1_do
+	clk  => clock_18n,
+	we   => bgram1_we,
+	addr => mux_addr(10 downto 0),
+	d    => mux_cpu_do,
+	q    => bgram1_do
 );
 
 -- Tilemap RAM 2: tile attribute (1st half is radar + sprite registers; 2nd half is scrolling playfield)
-bgram2 : entity work.dualport_2clk_ram
-generic map(11,8)
+bgram2 : entity work.gen_ram
+generic map(aWidth => 11, dWidth => 8)
 port map(
-	clock_a   => clock_18n,
-	wren_a    => bgram2_we,
-	address_a => mux_addr(10 downto 0),
-	data_a    => mux_cpu_do,
-	q_a       => bgram2_do
+	clk  => clock_18n,
+	we   => bgram2_we,
+	addr => mux_addr(10 downto 0),
+	d    => mux_cpu_do,
+	q    => bgram2_do
 );
 
 ---------------------------------------------------------------------------
@@ -1469,27 +1472,27 @@ port map(
 -- 2E: 7489 RAM - 4-bit address, 4-bit data
 -- Stores small-object shape (top 3 bits) and X pos msb.
 -- On original hardware, this RAM has inverted outputs.
-soram : entity work.dualport_2clk_ram
-generic map(4,4)
+soram : entity work.gen_ram
+generic map(aWidth => 4, dWidth => 4)
 port map(
-	clock_a    => clock_18n,
-	wren_a     => soram_we,
-	address_a  => mux_addr(3 downto 0),
-	data_a     => mux_cpu_do(3 downto 0),
-	q_a        => soram_do
+	clk  => clock_18n,
+	we   => soram_we,
+	addr => mux_addr(3 downto 0),
+	d    => mux_cpu_do(3 downto 0),
+	q    => soram_do
 );
 soram_do_n <= std_ulogic_vector(not soram_do);
 
 
 -- shared work RAM 1 - 0x7800-0x7FFF - called "share1" in MAME implementation
-wram : entity work.dualport_2clk_ram
-generic map(11,8)
+wram : entity work.gen_ram
+generic map(aWidth => 11, dWidth => 8)
 port map(
-	clock_a   => clock_18n,
-	wren_a    => wram_we,
-	address_a => mux_addr(10 downto 0),
-	data_a    => mux_cpu_do,
-	q_a       => wram_do
+	clk  => clock_18n,
+	we   => wram_we,
+	addr => mux_addr(10 downto 0),
+	d    => mux_cpu_do,
+	q    => wram_do
 );
 
 end struct;
